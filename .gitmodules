@@ -1,0 +1,3 @@
+[submodule "DOC/INTERNAL/MBSE/sysmlv2"]
+	path = DOC/INTERNAL/MBSE/sysmlv2
+	url = https://github.com/MontiCore/sysmlv2
