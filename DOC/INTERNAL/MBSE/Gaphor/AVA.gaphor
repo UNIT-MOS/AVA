@@ -15872,7 +15872,7 @@
 </SysML:PropertyItem>
 <UML:Property id="ed20a6e7-a9ce-11f1-bdcf-57eaa53ca127">
 <name>
-<val>Ant-0</val>
+<val>SMA</val>
 </name>
 <presentation>
 <reflist>
@@ -16214,7 +16214,7 @@
 </UML:Property>
 <UML:Property id="2bb2b543-a9cf-11f1-ba87-57eaa53ca127">
 <name>
-<val>Hall-0</val>
+<val>SS411A</val>
 </name>
 <presentation>
 <reflist>
