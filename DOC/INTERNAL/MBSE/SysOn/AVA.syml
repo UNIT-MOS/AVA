@@ -1,0 +1,391 @@
+package 'Concept-Level' {
+	view view1 : StandardViewDefinitions::GeneralView;
+	package Behaviour;
+	package Requirements;
+	package Structure;
+}
+package 'Logical-Level' {
+	package Structure {
+		view 'Logical-Structure-View' : StandardViewDefinitions::GeneralView {
+			expose Parts::'RC-Car'::ECU::'Operating-System';
+			expose Parts::'RC-Car'::ECU::Middleware;
+			expose Parts::'RC-Car'::'Battery-Management-System'::Battery;
+			expose Parts::'RC-Car'::ECU;
+			expose Parts::'RC-Car'::Sensor;
+			expose Parts::'RC-Car'::'Battery-Management-System';
+			expose Parts::'RC-Car'::'Human-Machine-Interface';
+			expose Parts::'RC-Car'::Actuator;
+			expose Parts::'RC-Car'::'Buck-Boost-Converter';
+			expose Parts::'RC-Car'::'Battery-Management-System'::Battery;
+			expose Parts::'RC-Car'::ECU::'Operating-System';
+			expose Parts::'RC-Car'::ECU::Middleware;
+			expose Parts::'RC-Car'::ECU::'Application-SW';
+			expose Parts::Steering;
+			expose Parts::'Engine Speed Control';
+			expose Parts::'Engine Speed Control'::Engine;
+			expose Parts::'RC-Car';
+		}
+		view 'Logical-Sensor-View' : StandardViewDefinitions::GeneralView {
+			expose Parts::'RC-Car'::Sensor;
+			expose Parts::'Temperature-Sensor';
+			expose Parts::'Hall-Effect-Sensor';
+			expose Parts::'Light Detection And Ranging';
+			expose Parts::'Inertial Measurement Unit';
+			expose Parts::'Ultrasonic-Sensor';
+			expose Parts::Camera;
+			expose Parts::Antenna;
+		}
+		view 'Logical-HMI-View' : StandardViewDefinitions::GeneralView {
+			expose Parts::'RC-Car'::'Human-Machine-Interface';
+			expose Parts::Webinterface;
+			expose Parts::Webinterface::Webserver;
+			expose Parts::'Remote Control';
+			expose Parts::'Remote Control'::'Radio Receiver';
+			expose Parts::'State-LED';
+		}
+		view 'Logical-Actuator-View' : StandardViewDefinitions::GeneralView {
+			expose Parts::'RC-Car'::Actuator;
+			expose Parts::Steering;
+			expose Parts::'Engine Speed Control';
+			expose Parts::'Engine Speed Control'::Engine;
+		}
+	}
+	package Parts {
+		part Steering :> 'RC-Car'::Actuator;
+		part 'Engine Speed Control' :> 'RC-Car'::Actuator {
+			part Engine;
+		}
+		part 'Temperature-Sensor' :> 'RC-Car'::Sensor;
+		part 'Hall-Effect-Sensor' :> 'RC-Car'::Sensor;
+		part 'Light Detection And Ranging' :> 'RC-Car'::Sensor;
+		part 'Inertial Measurement Unit' :> 'RC-Car'::Sensor;
+		part 'Ultrasonic-Sensor' :> 'RC-Car'::Sensor;
+		part Camera :> 'RC-Car'::Sensor;
+		part Antenna :> 'RC-Car'::Sensor;
+		part def 'RC-Car' {
+			part 'Battery-Management-System' {
+				part Battery;
+				part Battery;
+			}
+			part Sensor;
+			part 'Human-Machine-Interface';
+			part ECU {
+				part 'Operating-System';
+				part Middleware;
+				part 'Operating-System';
+				part Middleware;
+				part 'Application-SW';
+			}
+			part 'Buck-Boost-Converter';
+			part Actuator;
+		}
+		part 'Remote Control' :> 'RC-Car'::'Human-Machine-Interface' {
+			part 'Radio Receiver';
+		}
+		part Webinterface :> 'RC-Car'::'Human-Machine-Interface' {
+			part Webserver;
+		}
+		part 'State-LED' :> 'RC-Car'::'Human-Machine-Interface';
+	}
+}
+package 'Technology-Level' {
+	package Requirements;
+	package Structure {
+		package 'Version-0';
+		package 'Version-1' {
+			view 'Tech-ECU-View' : StandardViewDefinitions::GeneralView {
+				expose Part::'Jetson Orin NX';
+				expose Part::'ESP32-DevKitC';
+				expose Part::'ESP32-C3-SuperMini';
+				expose Part::'ESP32-DevKitC'::USB;
+				expose Part::'Jetson Orin NX'::USB;
+				expose Part::'Jetson Orin NX'::USB;
+				expose Part::'ESP32-C3-SuperMini'::USB;
+				expose Part::'ESP32-DevKitC'::UART;
+				expose Part::'ESP32-C3-SuperMini'::UART;
+			}
+			view 'Tech-ESP32-DevKit-View' : StandardViewDefinitions::GeneralView {
+				expose Part::'ESP32-DevKitC';
+				expose Part::'WS2812B-RGB-LED-F';
+				expose Part::'ESP32-DevKitC'::GPIO4;
+				expose Part::'WS2812B-RGB-LED-B';
+				expose Part::'WS2812B-RGB-LED-F'::DIN;
+				expose Part::'WS2812B-RGB-LED-B'::DIN;
+				expose Part::'ESP32-DevKitC'::GPIO18;
+				expose Part::SRTCH260S;
+				expose Part::'ESP32-DevKitC'::GPIO19;
+				expose Part::SRTCH260S::DIN;
+				expose Part::'RBR-C120A';
+				expose Part::'ESP32-DevKitC'::GPIO21;
+				expose Part::'RBR-C120A'::DIN;
+				expose Part::'MEUS-Racing-10B';
+				expose Part::'MEUS-Racing-10B'::CH1;
+				expose Part::'MEUS-Racing-10B'::CH2;
+				expose Part::'ESP32-DevKitC'::GPIO22;
+				expose Part::'ESP32-DevKitC'::GPIO23;
+				expose Part::SMA;
+				expose Part::'ESP32-DevKitC'::'Wifi-Comms';
+				expose Part::SMA::SMA;
+				expose Part::BNO085;
+				expose Part::BNO085::DOU;
+				expose Part::'ESP32-DevKitC'::'GPIO-A';
+			}
+			view 'Tech-Jetson-Orin-NX-View' : StandardViewDefinitions::GeneralView {
+				expose Part::'Jetson Orin NX';
+				expose Part::BNO085;
+				expose Part::'Arducam-UC-852';
+				expose Part::'STL-27';
+				expose Part::'Jetson Orin NX'::'GPIO-A';
+				expose Part::'Jetson Orin NX'::'USB-0';
+				expose Part::'Jetson Orin NX'::'USB-1';
+				expose Part::BNO085::DOU;
+				expose Part::'Arducam-UC-852'::USB;
+				expose Part::'STL-27'::USB;
+			}
+			view 'Tech-ESP32-C3-SuperMini-View' : StandardViewDefinitions::GeneralView {
+				expose Part::'ESP32-C3-SuperMini';
+				expose Part::SS411A;
+				expose Part::'Zeee-4S-14.8V-100C-48.84Wh';
+				expose Part::'Zeee-2S-7.4V-100C-8Ah-LiPo';
+				expose Part::'ESP32-C3-SuperMini'::GPIO5;
+				expose Part::'ESP32-C3-SuperMini'::A0;
+				expose Part::'ESP32-C3-SuperMini'::A1;
+				expose Part::SS411A::DOU;
+				expose Part::'Zeee-4S-14.8V-100C-48.84Wh'::VCC;
+				expose Part::'Zeee-2S-7.4V-100C-8Ah-LiPo'::VCC;
+			}
+			view 'Tech-Power-Domain-View' : StandardViewDefinitions::GeneralView {
+				expose Part::'Zeee-4S-14.8V-100C-48.84Wh';
+				expose Part::'609W-HX';
+				expose Part::'609W-HX'::VCC;
+				expose Part::'609W-HX'::VDD;
+				expose Part::'Jetson Orin NX';
+				expose Part::'Jetson Orin NX'::VDD;
+				expose Part::LM2696S;
+				expose Part::LM2696S::VCC;
+				expose Part::'WS2812B-RGB-LED-F';
+				expose Part::'WS2812B-RGB-LED-B';
+				expose Part::'WS2812B-RGB-LED-F'::VCC;
+				expose Part::'WS2812B-RGB-LED-B'::VCC;
+				expose Part::LM2696S::VDD;
+				expose Part::'ESP32-DevKitC';
+				expose Part::'ESP32-C3-SuperMini';
+				expose Part::'Zeee-2S-7.4V-100C-8Ah-LiPo';
+				expose Part::'RBR-C120A';
+				expose Part::'RBR-C120A'::VCC;
+				expose Part::'Carson-606257';
+				expose Part::SRTCH260S;
+				expose Part::'Carson-606257'::VCC;
+				expose Part::SRTCH260S::VDD;
+				expose Part::'RBR-C120A'::VDD;
+			}
+			view view6 : StandardViewDefinitions::ActionFlowView;
+		}
+		package Connection {
+			flow from Part::'Zeee-4S-14.8V-100C-48.84Wh'.VCC.VCC to Part::'609W-HX'.VCC.VCC;
+			flow from Part::'609W-HX'.VDD.VDD to Part::'Jetson Orin NX'.VDD.VDD;
+			flow from Part::'Zeee-4S-14.8V-100C-48.84Wh'.VCC.VCC to Part::LM2696S.VCC.VCC;
+			flow from Part::LM2696S.VDD.VDD to Part::'WS2812B-RGB-LED-B'.VCC.VCC;
+			flow from Part::LM2696S.VDD.VDD to Part::'WS2812B-RGB-LED-F'.VCC.VCC;
+			flow 'Acceleration-Data' from Part::BNO085.DOU.DOU to Part::'ESP32-DevKitC'.'GPIO-A'.'GPIO-A';
+			flow from Part::'Zeee-2S-7.4V-100C-8Ah-LiPo'.VCC.VCC to Part::'RBR-C120A'.VCC.VCC;
+			flow from Part::'Zeee-2S-7.4V-100C-8Ah-LiPo'.VCC.VCC to Part::'Carson-606257'.VCC.VCC;
+			flow from Part::'RBR-C120A'.VDD.VDD to Part::SRTCH260S.VDD.VDD;
+			flow Encoder from Part::SS411A.DOU.DOU to Part::'ESP32-C3-SuperMini'.GPIO5.GPIO5;
+			flow Voltage from Part::'Zeee-4S-14.8V-100C-48.84Wh'.VCC.VCC to Part::'ESP32-C3-SuperMini'.A0.A0;
+			flow Voltage from Part::'Zeee-2S-7.4V-100C-8Ah-LiPo'.VCC.VCC to Part::'ESP32-C3-SuperMini'.A1.A1;
+			flow 'Acceleration-Data' from 'Technology-Level'::Part::BNO085.DOU.DOU to Part::'Jetson Orin NX'.'GPIO-A'.'GPIO-A';
+			flow 'Image-Data' from Part::'Arducam-UC-852'.USB.USB to Part::'Jetson Orin NX'.'USB-0'.'USB-0';
+			flow 'Distance-Data' from Part::'STL-27'.USB.USB to Part::'Jetson Orin NX'.'USB-1'.'USB-1';
+			flow 'Drive-Mode' from Part::'ESP32-DevKitC'.GPIO4.GPIO4 to Part::'WS2812B-RGB-LED-F'.DIN.DIN;
+			flow 'Drive-Mode' from Part::'ESP32-DevKitC'.GPIO18.GPIO18 to Part::'WS2812B-RGB-LED-B'.DIN.DIN;
+			flow 'Steering-Data' from Part::'ESP32-DevKitC'.GPIO19.GPIO19 to Part::SRTCH260S.DIN.DIN;
+			flow 'Acceleration-Data' from Part::'ESP32-DevKitC'.GPIO21.GPIO21 to Part::'RBR-C120A'.DIN.DIN;
+			flow 'Acceleration-Data' from Part::'MEUS-Racing-10B'.CH2.CH2 to Part::'ESP32-DevKitC'.GPIO22.GPIO22;
+			flow 'Steering-Data' from Part::'MEUS-Racing-10B'.CH1.CH1 to Part::'ESP32-DevKitC'.GPIO23.GPIO23;
+			connect Part::SMA.SMA to Part::'ESP32-DevKitC'.'Wifi-Comms';
+			connect Part::'ESP32-DevKitC'.USB to Part::'Jetson Orin NX'.USB;
+			connect Part::'Jetson Orin NX'.'Technology-Level'::Part::'Jetson Orin NX'::USB to Part::'ESP32-C3-SuperMini'.USB;
+			connection Comms connect Part::'ESP32-DevKitC'.UART to Part::'ESP32-C3-SuperMini'.UART;
+		}
+	}
+	package Behaviour;
+	package Part {
+		port 'Carson-606257' {
+			in port VCC {
+				reference1;
+			}
+		}
+		part BNO085 {
+			out port DOU {
+				reference1;
+			}
+		}
+		part LM2696S {
+			in port VCC {
+				reference1;
+			}
+			out port VDD {
+				reference1;
+				reference2;
+			}
+		}
+		part '609W-HX' {
+			in port VCC {
+				reference1;
+			}
+			out port VDD {
+				reference1;
+			}
+		}
+		part 'Zeee-2S-7.4V-100C-8Ah-LiPo' {
+			out port VCC {
+				reference1;
+				reference2;
+				reference3;
+			}
+		}
+		part 'Zeee-4S-14.8V-100C-48.84Wh' {
+			out port VCC {
+				reference1;
+				reference2;
+				reference3;
+			}
+		}
+		part SS411A {
+			out port DOU {
+				reference1;
+			}
+		}
+		part 'STL-27' {
+			out port USB {
+				reference1;
+			}
+		}
+		part 'Arducam-UC-852' {
+			out port USB {
+				reference1;
+			}
+		}
+		part BNO085 {
+			out port DOU {
+				reference1;
+			}
+		}
+		part SMA {
+			inout port SMA;
+		}
+		part 'MEUS-Racing-10B' {
+			out port CH1 {
+				reference1;
+			}
+			out port CH2 {
+				reference1;
+			}
+		}
+		part SRTCH260S {
+			in port DIN {
+				reference1;
+			}
+			in port VDD {
+				reference1;
+			}
+		}
+		part 'WS2812B-RGB-LED-B' {
+			in port DIN {
+				reference1;
+			}
+			in port VCC {
+				reference1;
+			}
+		}
+		part 'WS2812B-RGB-LED-F' {
+			in port DIN {
+				reference1;
+			}
+			in port VCC {
+				reference1;
+			}
+		}
+		part 'ESP32-C3-SuperMini' {
+			inout port USB {
+				reference1;
+			}
+			inout port UART;
+			in port GPIO5 {
+				reference1;
+			}
+			in port A0 {
+				reference1;
+			}
+			in port A1 {
+				reference1;
+			}
+		}
+		part 'ESP32-DevKitC' {
+			inout port USB {
+				reference1;
+				reference2;
+				reference3;
+				reference4;
+			}
+			inout port UART;
+			out port GPIO4 {
+				reference1;
+			}
+			out port GPIO18 {
+				reference1;
+			}
+			out port GPIO19 {
+				reference1;
+			}
+			out port GPIO21 {
+				reference1;
+			}
+			in port GPIO22 {
+				reference1;
+			}
+			in port GPIO23 {
+				reference1;
+			}
+			inout port 'Wifi-Comms';
+			in port 'GPIO-A' {
+				reference1;
+			}
+		}
+		part 'Jetson Orin NX' {
+			inout port USB {
+				reference1;
+				reference2;
+				reference3;
+				reference4;
+			}
+			inout port USB {
+				reference1;
+			}
+			in port 'GPIO-A' {
+				reference1;
+			}
+			in port 'USB-0' {
+				reference1;
+			}
+			in port 'USB-1' {
+				reference1;
+			}
+			in port VDD {
+				reference1;
+			}
+		}
+		part 'RBR-C120A' {
+			in port DIN {
+				reference1;
+			}
+			in port VCC {
+				reference1;
+			}
+			out port VDD {
+				reference1;
+			}
+		}
+	}
+}
