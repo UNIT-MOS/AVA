@@ -19,10 +19,11 @@ package 'Logical-Level' {
 			expose Parts::'RC-Car'::ECU::'Operating-System';
 			expose Parts::'RC-Car'::ECU::Middleware;
 			expose Parts::'RC-Car'::ECU::'Application-SW';
-			expose Parts::Steering;
+			expose Parts::Servo;
 			expose Parts::'Engine Speed Control';
 			expose Parts::'Engine Speed Control'::Engine;
 			expose Parts::'RC-Car';
+			expose Parts::'RC-Car'::'Undervoltage Protection';
 		}
 		view 'Logical-Sensor-View' : StandardViewDefinitions::GeneralView {
 			expose Parts::'RC-Car'::Sensor;
@@ -38,19 +39,19 @@ package 'Logical-Level' {
 			expose Parts::'RC-Car'::'Human-Machine-Interface';
 			expose Parts::Webinterface;
 			expose Parts::Webinterface::Webserver;
-			expose Parts::'Remote Control';
-			expose Parts::'Remote Control'::'Radio Receiver';
+			expose Parts::'Remote Controller';
+			expose Parts::'Remote Controller'::'Radio Receiver';
 			expose Parts::'State-LED';
 		}
 		view 'Logical-Actuator-View' : StandardViewDefinitions::GeneralView {
 			expose Parts::'RC-Car'::Actuator;
-			expose Parts::Steering;
+			expose Parts::Servo;
 			expose Parts::'Engine Speed Control';
 			expose Parts::'Engine Speed Control'::Engine;
 		}
 	}
 	package Parts {
-		part Steering :> 'RC-Car'::Actuator;
+		part Servo :> 'RC-Car'::Actuator;
 		part 'Engine Speed Control' :> 'RC-Car'::Actuator {
 			part Engine;
 		}
@@ -77,8 +78,9 @@ package 'Logical-Level' {
 			}
 			part 'Buck-Boost-Converter';
 			part Actuator;
+			part 'Undervoltage Protection';
 		}
-		part 'Remote Control' :> 'RC-Car'::'Human-Machine-Interface' {
+		part 'Remote Controller' :> 'RC-Car'::'Human-Machine-Interface' {
 			part 'Radio Receiver';
 		}
 		part Webinterface :> 'RC-Car'::'Human-Machine-Interface' {
@@ -89,16 +91,58 @@ package 'Logical-Level' {
 	package Behaviour;
 	package Requirements {
 		view 'RC-Car-Requirements' {
-			view 'Requirements-View' : StandardViewDefinitions::GeneralView {
-				expose requirement1;
+			view 'General-Requirements' : StandardViewDefinitions::GeneralView {
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.';
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must detect its environment through sensors.';
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must move using its actuators.';
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must drive autonomously.';
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must be remotely controlled by a Human Machine Interface (HMI).';
 			}
-			requirement requirement1;
+			view 'Autonomous-Requirements' : StandardViewDefinitions::GeneralView {
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must drive autonomously.';
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must drive autonomously.'::'The RC-Car must control its actuators in autonomous mode.';
+				expose ;
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must drive autonomously.'::'The RC-Car must plan its optimal route.';
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must drive autonomously.'::'The RC-Car must perceive its environment.';
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must drive autonomously.'::'The RC-Car must perceive its environment.'::'The RC-Car must detect nearby objects.';
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must drive autonomously.'::'The RC-Car must perceive its environment.'::'The RC-Car must know its current position.';
+			}
+			view 'HMI-Requirements' : StandardViewDefinitions::GeneralView {
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must be remotely controlled by a Human Machine Interface (HMI).';
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must be remotely controlled by a Human Machine Interface (HMI).'::'The HMI must enable switching between manual and autonomous control.';
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must be remotely controlled by a Human Machine Interface (HMI).'::'The HMI must enable manual control using a remote controller.';
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must be remotely controlled by a Human Machine Interface (HMI).'::'The HMI must enable manual control through a website.';
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must be remotely controlled by a Human Machine Interface (HMI).'::'The HMI must alarm the user of low battery voltage.';
+				expose Req::'The RC-Car must either drive autonomously or through manual operation.'::'The RC-Car must be remotely controlled by a Human Machine Interface (HMI).'::'The HMI must show sensor data.';
+			}
+		}
+		package Req {
+			requirement 'The RC-Car must either drive autonomously or through manual operation.' {
+				requirement 'The RC-Car must detect its environment through sensors.';
+				requirement 'The RC-Car must move using its actuators.';
+				requirement 'The RC-Car must drive autonomously.' {
+					requirement 'The RC-Car must control its actuators in autonomous mode.';
+					requirement 'The RC-Car must plan its optimal route.';
+					requirement 'The RC-Car must perceive its environment.' {
+						requirement 'The RC-Car must know its current position.';
+						requirement 'The RC-Car must detect nearby objects.';
+					}
+				}
+				requirement 'The RC-Car must be remotely controlled by a Human Machine Interface (HMI).' {
+					requirement 'The HMI must enable switching between manual and autonomous control.';
+					requirement 'The HMI must enable manual control using a remote controller.';
+					requirement 'The HMI must enable manual control through a website.';
+					requirement 'The HMI must alarm the user of low battery voltage.';
+					requirement 'The HMI must show sensor data.';
+				}
+			}
 		}
 	}
 }
 package 'Technology-Level' {
 	package Requirements;
 	package Structure {
+		private import 'Logical-Level'::Parts::*;
 		view 'Tech-ECU' : StandardViewDefinitions::GeneralView {
 			expose Part::'Jetson Orin NX';
 			expose Part::'ESP32-DevKitC';
@@ -118,9 +162,7 @@ package 'Technology-Level' {
 			expose Part::'WS2812B-RGB-LED-F'::DIN;
 			expose Part::'WS2812B-RGB-LED-B'::DIN;
 			expose Part::'ESP32-DevKitC'::GPIO18;
-			expose Part::SRTCH260S;
 			expose Part::'ESP32-DevKitC'::GPIO19;
-			expose Part::SRTCH260S::DIN;
 			expose Part::'RBR-C120A';
 			expose Part::'ESP32-DevKitC'::GPIO21;
 			expose Part::'RBR-C120A'::DIN;
@@ -132,15 +174,13 @@ package 'Technology-Level' {
 			expose Part::SMA;
 			expose Part::'ESP32-DevKitC'::'Wifi-Comms';
 			expose Part::SMA::SMA;
-			expose Part::BNO085;
-			expose Part::BNO085::DOU;
-			expose Part::'ESP32-DevKitC'::'GPIO-A';
 			expose Part::'ESP32-DevKitC'::'Steering-Command';
 			expose Part::'ESP32-DevKitC'::'Steering-Signal';
 			expose Part::'ESP32-DevKitC'::Acceleration;
 			expose Part::'ESP32-DevKitC'::SMA;
 			expose Part::'ESP32-DevKitC'::'Acceleration-Signal';
 			expose Part::'ESP32-DevKitC'::'Acceleration-Command';
+			expose Part::'Carson-606257';
 		}
 		view 'Tech-Jetson-Orin-NX-View' : StandardViewDefinitions::GeneralView {
 			expose Part::'Jetson Orin NX';
@@ -191,25 +231,21 @@ package 'Technology-Level' {
 			expose Part::'Zeee-2S-7.4V-100C-8Ah-LiPo';
 			expose Part::'RBR-C120A';
 			expose Part::'RBR-C120A'::VCC;
-			expose Part::'Carson-606257';
 			expose Part::SRTCH260S;
-			expose Part::'Carson-606257'::VCC;
 			expose Part::SRTCH260S::VDD;
 			expose Part::'RBR-C120A'::VDD;
+			expose Part::'Carson-606257';
+			expose Part::'Carson-606257'::VCC;
+			expose Part::'Carson-606257'::DIN;
 		}
 	}
 	package Part {
-		port 'Carson-606257' {
-			in port VCC {
-				reference1;
-			}
-		}
-		part BNO085 {
-			out port DOU {
-				reference1;
-			}
-		}
-		part LM2696S {
+		private import 'Logical-Level'::Parts::'Engine Speed Control'::*;
+		private import 'Logical-Level'::Parts::'Remote Controller'::*;
+		private import 'Logical-Level'::Parts::'RC-Car'::*;
+		private import 'Logical-Level'::Parts::'RC-Car'::'Battery-Management-System'::*;
+		private import 'Logical-Level'::Parts::*;
+		part LM2696S : 'Buck-Boost-Converter' {
 			in port VCC {
 				reference1;
 			}
@@ -218,7 +254,7 @@ package 'Technology-Level' {
 				reference2;
 			}
 		}
-		part '609W-HX' {
+		part '609W-HX' : 'Undervoltage Protection' {
 			in port VCC {
 				reference1;
 			}
@@ -226,44 +262,45 @@ package 'Technology-Level' {
 				reference1;
 			}
 		}
-		part 'Zeee-2S-7.4V-100C-8Ah-LiPo' {
+		part 'Zeee-2S-7.4V-100C-8Ah-LiPo' : Battery {
+			out port VCC {
+				reference1;
+				reference2;
+				reference3;
+				reference4;
+			}
+		}
+		part 'Zeee-4S-14.8V-100C-48.84Wh' : Battery {
 			out port VCC {
 				reference1;
 				reference2;
 				reference3;
 			}
 		}
-		part 'Zeee-4S-14.8V-100C-48.84Wh' {
-			out port VCC {
-				reference1;
-				reference2;
-				reference3;
-			}
-		}
-		part SS411A {
+		part SS411A : 'Hall-Effect-Sensor' {
 			out port DOU {
 				reference1;
 			}
 		}
-		part 'STL-27' {
+		part 'STL-27' : 'Light Detection And Ranging' {
 			out port USB {
 				reference1;
 			}
 		}
-		part 'Arducam-UC-852' {
+		part 'Arducam-UC-852' : Camera {
 			out port USB {
 				reference1;
 			}
 		}
-		part BNO085 {
+		part BNO085 : 'Inertial Measurement Unit' {
 			out port DOU {
 				reference1;
 			}
 		}
-		part SMA {
+		part SMA : Antenna {
 			inout port SMA;
 		}
-		part 'MEUS-Racing-10B' {
+		part 'MEUS-Racing-10B' : 'Radio Receiver' {
 			out port CH1 {
 				reference1;
 			}
@@ -271,15 +308,12 @@ package 'Technology-Level' {
 				reference1;
 			}
 		}
-		part SRTCH260S {
-			in port DIN {
-				reference1;
-			}
+		part SRTCH260S : Engine {
 			in port VDD {
 				reference1;
 			}
 		}
-		part 'WS2812B-RGB-LED-B' {
+		part 'WS2812B-RGB-LED-B' : 'State-LED' {
 			in port DIN {
 				reference1;
 			}
@@ -287,7 +321,7 @@ package 'Technology-Level' {
 				reference1;
 			}
 		}
-		part 'WS2812B-RGB-LED-F' {
+		part 'WS2812B-RGB-LED-F' : 'State-LED' {
 			in port DIN {
 				reference1;
 			}
@@ -295,7 +329,7 @@ package 'Technology-Level' {
 				reference1;
 			}
 		}
-		part 'ESP32-C3-SuperMini' {
+		part 'ESP32-C3-SuperMini' : ECU {
 			inout port USB {
 				reference1;
 			}
@@ -313,7 +347,7 @@ package 'Technology-Level' {
 			in attribute 'Bat-Main-Voltage';
 			in attribute 'Bat-ECU-Voltage';
 		}
-		part 'Jetson Orin NX' {
+		part 'Jetson Orin NX' : ECU {
 			inout port USB {
 				reference1;
 				reference2;
@@ -337,9 +371,9 @@ package 'Technology-Level' {
 			}
 			in attribute 'Acceleration-Signal';
 			in attribute Image;
-			attribute 'Object-Distance';
+			in attribute 'Object-Distance';
 		}
-		part 'RBR-C120A' {
+		part 'RBR-C120A' : 'Engine Speed Control' {
 			in port DIN {
 				reference1;
 			}
@@ -350,7 +384,7 @@ package 'Technology-Level' {
 				reference1;
 			}
 		}
-		part 'ESP32-DevKitC' {
+		part 'ESP32-DevKitC' : ECU {
 			inout port USB {
 				reference1;
 				reference2;
@@ -366,6 +400,8 @@ package 'Technology-Level' {
 			}
 			out port GPIO19 {
 				reference1;
+				reference2;
+				reference3;
 			}
 			out port GPIO21 {
 				reference1;
@@ -377,15 +413,21 @@ package 'Technology-Level' {
 				reference1;
 			}
 			inout port 'Wifi-Comms';
-			in port 'GPIO-A' {
-				reference1;
-			}
 			in attribute 'Steering-Command';
 			out attribute 'Steering-Signal';
 			in attribute Acceleration;
 			inout attribute SMA;
 			in attribute 'Acceleration-Signal';
 			out attribute 'Acceleration-Command';
+		}
+		in flow 'Steering-Data' from 'ESP32-DevKitC'.GPIO19.GPIO19 to.;
+		part 'Carson-606257' : Servo {
+			in port VCC {
+				reference1;
+			}
+			in port DIN {
+				reference1;
+			}
 		}
 	}
 	package Connection {
@@ -394,20 +436,19 @@ package 'Technology-Level' {
 		flow from Part::'Zeee-4S-14.8V-100C-48.84Wh'.VCC.VCC to Part::LM2696S.VCC.VCC;
 		flow from Part::LM2696S.VDD.VDD to Part::'WS2812B-RGB-LED-B'.VCC.VCC;
 		flow from Part::LM2696S.VDD.VDD to Part::'WS2812B-RGB-LED-F'.VCC.VCC;
-		flow 'Acceleration-Data' from Part::BNO085.DOU.DOU to Part::'ESP32-DevKitC'.'GPIO-A'.'GPIO-A';
+		flow 'Acceleration-Data' from.to Part::'ESP32-DevKitC'.null.;
 		flow from Part::'Zeee-2S-7.4V-100C-8Ah-LiPo'.VCC.VCC to Part::'RBR-C120A'.VCC.VCC;
-		flow from Part::'Zeee-2S-7.4V-100C-8Ah-LiPo'.VCC.VCC to Part::'Carson-606257'.VCC.VCC;
+		flow from Part::'Zeee-2S-7.4V-100C-8Ah-LiPo'.VCC.VCC to.;
 		flow from Part::'RBR-C120A'.VDD.VDD to Part::SRTCH260S.VDD.VDD;
-		flow Encoder from Part::SS411A.DOU.DOU to Part::'ESP32-C3-SuperMini'.GPIO5.GPIO5;
-		flow Voltage from Part::'Zeee-4S-14.8V-100C-48.84Wh'.VCC.VCC to Part::'ESP32-C3-SuperMini'.A0.A0;
-		flow Voltage from Part::'Zeee-2S-7.4V-100C-8Ah-LiPo'.VCC.VCC to Part::'ESP32-C3-SuperMini'.A1.A1;
-		flow 'Acceleration-Data' from 'Technology-Level'::Part::BNO085.DOU.DOU to Part::'Jetson Orin NX'.'GPIO-A'.'GPIO-A';
+		flow 'Encoder-Data' from Part::SS411A.DOU.DOU to Part::'ESP32-C3-SuperMini'.GPIO5.GPIO5;
+		flow 'Battery-Voltage' from Part::'Zeee-4S-14.8V-100C-48.84Wh'.VCC.VCC to Part::'ESP32-C3-SuperMini'.A0.A0;
+		flow 'Battery-Voltage' from Part::'Zeee-2S-7.4V-100C-8Ah-LiPo'.VCC.VCC to Part::'ESP32-C3-SuperMini'.A1.A1;
+		flow 'Acceleration-Data' from Part::BNO085.DOU.DOU to Part::'Jetson Orin NX'.'GPIO-A'.'GPIO-A';
 		flow 'Image-Data' from Part::'Arducam-UC-852'.USB.USB to Part::'Jetson Orin NX'.'USB-0'.'USB-0';
 		flow 'Distance-Data' from Part::'STL-27'.USB.USB to Part::'Jetson Orin NX'.'USB-1'.'USB-1';
 		flow 'Drive-Mode' from Part::'ESP32-DevKitC'.GPIO4.GPIO4 to Part::'WS2812B-RGB-LED-F'.DIN.DIN;
 		flow 'Drive-Mode' from Part::'ESP32-DevKitC'.GPIO18.GPIO18 to Part::'WS2812B-RGB-LED-B'.DIN.DIN;
-		in flow 'Steering-Data' from Part::'ESP32-DevKitC'.GPIO19.GPIO19 to Part::SRTCH260S.DIN.DIN;
-		flow 'Acceleration-Data' from Part::'ESP32-DevKitC'.GPIO21.GPIO21 to Part::'RBR-C120A'.DIN.DIN;
+		flow 'Acceleration-Signal' from Part::'ESP32-DevKitC'.GPIO21.GPIO21 to Part::'RBR-C120A'.DIN.DIN;
 		flow 'Acceleration-Data' from Part::'MEUS-Racing-10B'.CH2.CH2 to Part::'ESP32-DevKitC'.GPIO22.GPIO22;
 		flow 'Steering-Data' from Part::'MEUS-Racing-10B'.CH1.CH1 to Part::'ESP32-DevKitC'.GPIO23.GPIO23;
 		connect Part::SMA.SMA to Part::'ESP32-DevKitC'.'Wifi-Comms';
@@ -419,12 +460,15 @@ package 'Technology-Level' {
 		view 'Autonomous-Drive' : StandardViewDefinitions::ActionFlowView {
 			expose 'Drive autonomously';
 			expose 'Drive autonomously'::'Harvest sensor data';
-			expose 'Drive autonomously'::forkNode1;
+			expose 'Drive autonomously'::Fork1;
 			expose 'Drive autonomously'::'Localize current position';
 			expose 'Drive autonomously'::'Detect nearby objects';
 			expose 'Drive autonomously'::'Calculate optimal path';
 			expose 'Drive autonomously'::'Control actuators for optimal trajectory';
-			expose 'Drive autonomously'::joinNode1;
+			expose 'Drive autonomously'::Node1;
+			expose 'Drive autonomously'::'Autonomous mode enabled?';
+			expose 'Drive autonomously'::'Check drive mode';
+			expose 'Drive autonomously'::'Enter standby mode';
 		}
 		view 'Operational-Mode' : StandardViewDefinitions::ActionFlowView {
 			expose 'Run in standby';
@@ -441,7 +485,11 @@ package 'Technology-Level' {
 		}
 		view 'Manual-Drive' : StandardViewDefinitions::ActionFlowView {
 			expose 'Drive manually';
+			expose 'Drive manually'::'Check drive mode';
+			expose 'Drive manually'::'Manual mode enabled?';
 			expose 'Drive manually'::'Harvest control data from radio receiver';
+			expose 'Drive manually'::'Control actuators';
+			expose 'Drive manually'::'Enter standby mode';
 		}
 		action 'Run in standby' {
 			action 'Check secondary ECUs';
@@ -474,24 +522,45 @@ package 'Technology-Level' {
 			first then 'Harvest sensor data';
 			first then 'Harvest sensor data';
 			action 'Harvest sensor data';
-			first start then 'Harvest sensor data';
-			fork forkNode1;
+			fork Fork1;
 			action 'Localize current position';
 			action 'Detect nearby objects';
-			first 'Harvest sensor data' then forkNode1;
-			first forkNode1 then 'Localize current position';
-			first forkNode1 then 'Detect nearby objects';
+			first 'Harvest sensor data' then Fork1;
+			first Fork1 then 'Localize current position';
+			first Fork1 then 'Detect nearby objects';
 			action 'Calculate optimal path';
 			action 'Control actuators for optimal trajectory';
-			join joinNode1;
-			first 'Localize current position' then joinNode1;
-			first 'Detect nearby objects' then joinNode1;
-			first joinNode1 then 'Calculate optimal path';
+			join Node1;
+			first 'Localize current position' then Node1;
+			first 'Detect nearby objects' then Node1;
+			first Node1 then 'Calculate optimal path';
+			decide 'Autonomous mode enabled?';
+			action 'Check drive mode';
+			first start then 'Check drive mode';
+			first 'Check drive mode' then 'Autonomous mode enabled?';
+			succession Yes first 'Autonomous mode enabled?' then 'Harvest sensor data';
+			action 'Enter standby mode';
+			succession No first 'Autonomous mode enabled?' then 'Enter standby mode';
+			first 'Enter standby mode' then done;
 			first 'Calculate optimal path' then 'Control actuators for optimal trajectory';
-			first 'Control actuators for optimal trajectory' then done;
+			first 'Control actuators for optimal trajectory' then 'Check drive mode';
 		}
 		action 'Drive manually' {
+			first start then;
+			action 'Check drive mode';
+			first start then 'Check drive mode';
+			decide 'Manual mode enabled?';
+			first 'Check drive mode' then 'Manual mode enabled?';
 			action 'Harvest control data from radio receiver';
+			succession Yes first 'Manual mode enabled?' then 'Harvest control data from radio receiver';
+			action 'Control actuators';
+			action 'Enter standby mode';
+			first 'Enter standby mode' then done;
+			succession No first 'Manual mode enabled?' then 'Enter standby mode';
+			first 'Harvest control data from radio receiver' then 'Control actuators';
+			first 'Control actuators' then 'Check drive mode';
 		}
 	}
+	flow from Part::'Zeee-2S-7.4V-100C-8Ah-LiPo'.VCC.VCC to Part::'Carson-606257'.VCC.VCC;
+	flow 'Steering-Signal' from Part::'ESP32-DevKitC'.GPIO19.GPIO19 to Part::'Carson-606257'.DIN.DIN;
 }
