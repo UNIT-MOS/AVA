@@ -1,0 +1,19 @@
+# 3
+
+- image				:	3-dimensional matrix
+- object detection	:	bounding box, classification
+	- classification	:	trained model on unknown bounding box
+	- error rate		:	false negative (missed detection) + false positive (wrong detection)
+
+- sense-plan-act-cycle
+	- camera & object detection & localization - ... - ...
+
+- hardwired detection
+	- reproducible, known lab environment
+	- prone against lighting conditions, shadows, obstacles, distance
+
+- neural network
+	- different environmental conditions
+	
+
+# 4
